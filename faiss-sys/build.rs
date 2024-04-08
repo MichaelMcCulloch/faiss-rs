@@ -11,11 +11,13 @@ fn static_link_faiss() {
     cfg.define("FAISS_ENABLE_C_API", "ON")
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("CMAKE_BUILD_TYPE", "Release")
-        .define("FAISS_ENABLE_GPU", if cfg!(feature = "gpu") {
-            "ON"
-        } else {
-            "OFF"
-        })
+        .define("FAISS_OPT_LEVEL", "avx2")
+        .define("BLA_VENDOR", "Intel10_64_dyn")
+        .define("MKL_LIBRARIES", "/opt/intel/oneapi/mkl/latest/lib/intel64/")
+        .define(
+            "FAISS_ENABLE_GPU",
+            if cfg!(feature = "gpu") { "ON" } else { "OFF" },
+        )
         .define("FAISS_ENABLE_PYTHON", "OFF")
         .define("BUILD_TESTING", "OFF")
         .very_verbose(true);
@@ -31,7 +33,7 @@ fn static_link_faiss() {
         faiss_c_location.display()
     );
     println!("cargo:rustc-link-lib=static=faiss_c");
-    println!("cargo:rustc-link-lib=static=faiss");
+    println!("cargo:rustc-link-lib=static=faiss_avx2");
     link_cxx();
     println!("cargo:rustc-link-lib=gomp");
     println!("cargo:rustc-link-lib=blas");
